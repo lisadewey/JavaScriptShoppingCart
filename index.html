@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>JavaScript Shopping Cart</title>
+</head>
+<body>
+    <div id="output">Lisa's Shopping Cart</div>
+    <div id="output2">Shopping Cart</div>
+    <script>
+        var items = [{
+            name: 'Xanax to calm your nerves'
+            , details: 'Several bottles recommended after coding is JS'
+            , cost: 5000
+            , image: 'xanax.png'
+        }, {
+            name: 'Massage to recover from JS'
+            , details: '90 minutes will not be long enough'
+            , cost: 12000
+            , image: 'massage.png'
+        }, {
+            name: 'Essential Oil Burner'
+            , details: 'Comes with FU JS Scented Oils'
+            , cost: 3000
+            , image: 'oils.png'
+        }, {
+            name: 'Therapy Session'
+            , details: 'Necessary to unfurl from the fetal position after coding in JS'
+            , cost: 15000
+            , image: 'therapy.png'
+        }, {
+            name: 'Laptop'
+            , details: 'To replace the one you throw out the window while coding in JS'
+            , cost: 190000
+            , image: 'window.png'
+        }, {
+            name: 'Hair Weave'
+            , details: 'To replace the hair you pull out while coding in JS'
+            , cost: 20000
+            , image: 'weave.png'
+        }];
+        var html = '<br>';
+        var shopcart = [];
+        window.onload = init;
+
+        function init() {
+            buildItems();
+            var q = document.querySelectorAll('.productItem');
+            for (var x = 0; x < q.length; x++) {
+                q[x].addEventListener('click', function (e) {
+                    e.preventDefault();
+                    addToCart();
+                })
+            }
+            outputCart();
+        }
+
+        function addToCart() {
+            var iteminfo = event.target.dataset;
+            var itemincart = false;
+            iteminfo.qty = 1;
+            shopcart.forEach(function (v) {
+                if (v.id == iteminfo.id) {
+                    v.qty = parseInt(v.qty) + parseInt(iteminfo.qty);
+                    itemincart = true;
+                }
+            });
+            if (!itemincart) {
+                shopcart.push(iteminfo);
+            }
+            localStorage.setItem('scart', JSON.stringify(shopcart));
+            outputCart();
+        }
+
+        function outputCart() {
+            if (localStorage.getItem('scart') != null) {
+                shopcart = JSON.parse(localStorage.getItem('scart'));
+            }
+            var html = '<table><tr><th>item</th><th>quantity</th><th>price</th><th>id</th><th>subtotal</th><th>remove</th></tr>';
+            var total = 0;
+            shopcart.forEach(function (v) {
+                var stotal = v.qty * v.price;
+                total += stotal;
+                html += '<tr><td>' + v.name + '(' + v.s + ')</td><td>' + v.qty + '</td><td>' +fMoney(v.price) + '</td><td>' + v.id + '</td><td>' + fMoney(stotal) + '</td><td><span class="remove btn" onclick="remove(' + v.id + ')">x</span></td></tr>';
+            });
+            html += '<tr><td colspan=6>Total ' + fMoney(total) + '</td></tr></table>';
+            document.getElementById('output2').innerHTML = html;
+        }
+
+        function buildItems() {
+            var x = 0;
+            items.forEach(function (v) {
+                html += '<div class="item"><h3>' + v.name + '</h3><img src="/img/' + v.image + '" class="img-fluid"><div>' + v.details + ' <br><a href="#" class="productItem" data-name="' + v.name + '" data-s="' + v.details + '"  data-price="' + v.cost + '" data-id="' + x + '" >Add to Cart</a></div>' + fMoney(v.cost) + '</div>';
+                x++;
+            })
+            document.getElementById('output').innerHTML += html;
+        }
+
+        function remove(id) {
+            for (var x = 0; x < shopcart.length; x++) {
+                if (shopcart[x].id == id) {
+                    var rem = shopcart.splice(x, 1);
+                    console.log(rem);
+                }
+            }
+            localStorage.setItem('scart', JSON.stringify(shopcart));
+            outputCart();
+        }
+
+        function fMoney(n) {
+            return '$' + (n / 100).toFixed(2);
+        }
+    </script>
+
+</body>
+</html>
